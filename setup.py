@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="dacite",
-    version="1.5.0",
+    version="1.6.0",
     description="Simple creation of data classes from dictionaries.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -19,6 +19,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     python_requires=">=3.6",
@@ -26,5 +27,5 @@ setup(
     packages=["dacite"],
     package_data={"dacite": ["py.typed"]},
     install_requires=['dataclasses;python_version<"3.7"'],
-    extras_require={"dev": ["pytest>=4", "pytest-cov", "coveralls", "black", "mypy", "pylint"]},
+    extras_require={"dev": ["pytest>=5", "pytest-cov", "coveralls", "black", "mypy", "pylint"]},
 )

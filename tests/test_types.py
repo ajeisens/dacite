@@ -1,6 +1,6 @@
 import sys
 from dataclasses import InitVar
-from typing import Optional, Union, List, Any, Dict, NewType, TypeVar, Generic, Collection, Tuple
+from typing import Optional, Union, List, Any, Dict, NewType, TypeVar, Generic, Collection, Tuple, Type
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -23,6 +23,8 @@ from dacite.types import (
     transform_value,
     is_literal,
     is_init_var,
+    extract_init_var,
+    is_type_generic,
 )
 from tests.common import literal_support, init_var_type_support
 
@@ -125,6 +127,14 @@ def test_is_instance_with_union_and_not_matching_value_type():
     assert not is_instance("test", Union[int, float])
 
 
+def test_is_instance_with_union_and_matching_generic_collection():
+    assert is_instance(["test"], Union[int, List[str]])
+
+
+def test_is_instance_with_union_and_not_matching_generic_collection():
+    assert not is_instance(["test"], Union[int, List[int]])
+
+
 def test_is_instance_with_optional_and_matching_value_type():
     assert is_instance(1, Optional[int])
 
@@ -185,6 +195,14 @@ def test_is_instance_with_init_var_and_matching_value_type():
 @init_var_type_support
 def test_is_instance_with_init_var_and_not_matching_value_type():
     assert not is_instance(1, InitVar[str])
+
+
+def test_is_instance_with_with_type_and_matching_value_type():
+    assert is_instance(str, Type[str])
+
+
+def test_is_instance_with_with_type_and_not_matching_value_type():
+    assert not is_instance(1, Type[str])
 
 
 def test_is_instance_with_not_supported_generic_types():
@@ -253,6 +271,10 @@ def test_is_instance_with_tuple_and_not_matching_type():
     assert not is_instance((1, 2), Tuple[int, str])
 
 
+def test_is_instance_with_tuple_and_wrong_length():
+    assert not is_instance((1, "test", 2), Tuple[int, str])
+
+
 def test_is_instance_with_variable_length_tuple_and_matching_type():
     assert is_instance((1, 2, 3), Tuple[int, ...])
 
@@ -271,6 +293,10 @@ def test_is_instance_with_empty_tuple_and_not_matching_type():
 
 def test_extract_generic():
     assert extract_generic(List[int]) == (int,)
+
+
+def test_extract_generic_with_defaults():
+    assert extract_generic(List, defaults=(Any,)) == (Any,)
 
 
 def test_transform_value_without_matching_type():
@@ -340,3 +366,16 @@ def test_transform_value_with_cast_matching_base_class():
         pass
 
     assert transform_value({}, [int], MyInt, "1") == 1
+
+
+@init_var_type_support
+def test_extract_init_var():
+    assert extract_init_var(InitVar[int]) == int
+
+
+def test_is_type_generic_with_matching_value():
+    assert is_type_generic(Type[int])
+
+
+def test_is_type_generic_with_not_matching_value():
+    assert not is_type_generic(int)
